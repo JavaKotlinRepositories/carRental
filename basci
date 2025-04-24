@@ -1,0 +1,10 @@
+Features
+User Registration & Authentication (JWT-based)
+Car Management (Add, Update, Delete cars)
+Rental Booking System (Reserve cars for specific dates)
+Admin Panel (Manage cars & users)
+Payment Handling (Mock payments)
+Tech Stack
+Frontend: React (Vite), CSS Modules
+Backend: Express.js, PostgreSQL (Sequelize ORM), JWT Auth
+Deployment: AWS S3 + CloudFront (Frontend), EC2 (Backend), RDS (PostgreSQL)
