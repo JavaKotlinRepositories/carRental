@@ -7,6 +7,16 @@ public class RenterDto {
     private String lastName;
     private String email;
     private String password;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    private String address;
     private MultipartFile profilePicture; // For file upload
 
     // Getters and Setters (or use Lombok for @Data)
