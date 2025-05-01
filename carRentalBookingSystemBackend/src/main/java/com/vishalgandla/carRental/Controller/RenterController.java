@@ -20,10 +20,7 @@ public class RenterController {
     private RenterService renterService;
 
 
-    @GetMapping("/renter")
-    public String home() {
-        return "Hello World";
-    }
+
 
     @PostMapping("/renter/login")
     public ResponseEntity<HashMap<String,String>> login(@RequestBody LoginUserDto loginUserDto) {

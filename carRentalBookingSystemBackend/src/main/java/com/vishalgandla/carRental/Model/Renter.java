@@ -1,9 +1,8 @@
 package com.vishalgandla.carRental.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import com.vishalgandla.carRental.Model.Location;
+import java.util.List;
 
 @Entity
 public class Renter {
@@ -16,6 +15,9 @@ public class Renter {
     private String password;
     private String address;
     private String profilePicture;
+    @OneToMany(mappedBy = "renter")
+    private List<Location> locations;
+
 
     public String getProfilePicture() {
         return profilePicture;

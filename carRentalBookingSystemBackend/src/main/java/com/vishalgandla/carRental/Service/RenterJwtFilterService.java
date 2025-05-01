@@ -1,6 +1,7 @@
 package com.vishalgandla.carRental.Service;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
@@ -13,7 +14,8 @@ import java.util.Date;
 public class RenterJwtFilterService {
 
     // Secret key for signing JWT (store securely, use environment variables in production)
-    private static final String SECRET_KEY = "yourSecretKeyHere"; // Replace with your secret key
+    @Value("${jwt_secret}")
+    String SECRET_KEY; // Replace with your secret key
 
     // Expiration time for JWT in milliseconds (e.g., 1 hour)
     private static final long EXPIRATION_TIME = 3600000*24; // 1 hour
