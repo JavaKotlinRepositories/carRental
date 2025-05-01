@@ -2,6 +2,9 @@ package com.vishalgandla.carRental.Model;
 
 import jakarta.persistence.*;
 
+import java.time.Clock;
+import java.time.LocalDate;
+
 @Entity
 public class Location {
     @Id
@@ -14,12 +17,32 @@ public class Location {
     private Float latitude;
     private Float longitude;
     private String carRentalPhoto;
+    private LocalDate createdDate;
+
     @ManyToOne
     @JoinColumn(name = "carRentalId",nullable = false)
     private Renter renter;
 
+    @PrePersist
+    public void onCreate(){
+        if(createdDate == null){
+            createdDate = LocalDate.now(Clock.systemUTC());
+        }
+    }
+
+
+
+
     public int getId() {
         return id;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
     }
 
     public void setId(int id) {

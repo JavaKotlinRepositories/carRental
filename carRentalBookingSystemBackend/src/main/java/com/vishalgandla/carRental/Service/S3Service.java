@@ -6,9 +6,7 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
@@ -68,6 +66,23 @@ public class S3Service {
         }
 
     }
+    public boolean deleteFile(String bucketName, String fileName) {
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build();
+
+
+            DeleteObjectResponse response = s3.deleteObject(deleteObjectRequest);
+            System.out.println("deleted successfully");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace(); // Optional: log the exception for debugging
+            return false;
+        }
+    }
+
 
 
 }
