@@ -15,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.*;
 
@@ -124,7 +126,41 @@ public class EachLocationService {
             return ResponseEntity.status(500).body(ret);
         }
     }
+    @Transactional
+    public ResponseEntity<HashMap<String,Object>> deleteLocationCars(HttpServletRequest request,  Integer id) {
+        HashMap<String,Object> ret = new HashMap<>();
+        try{
+            Renter renter=(Renter) request.getAttribute("renter");
+            if(renter==null)
+            {
+                ret.put("message","please send a valid token to create a car");
+                return ResponseEntity.status(403).body(ret);
+            }
+            Car car=carRepository.findById(id).get();
+            if(car==null){
+                ret.put("message","please send a valid car");
+                return ResponseEntity.status(403).body(ret);
+            }
 
+            Location location=locationRepository.findById(car.getLocation().getId()).get();
+            if(location==null){
+                ret.put("message","please send a valid location");
+                return ResponseEntity.status(403).body(ret);
+            }
+            if(location.getRenter().getId()!=renter.getId()){
+                ret.put("message","car does not belong to the renter");
+                return ResponseEntity.status(403).body(ret);
+            }
+            s3Service.deleteFile(carRentalCarPicturesBuckent,car.getPhoto());
+            carRepository.delete(car);
+            ret.put("message","Car deleted successfully");
+            return ResponseEntity.status(200).body(ret);
+        }
+        catch(Exception e){
+            ret.put("message","something went wrong with the request");
+            return ResponseEntity.status(500).body(ret);
+        }
 
+    }
 
 }

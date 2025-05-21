@@ -29,10 +29,12 @@ public class EachLocationController {
 
     @PostMapping("/getLocationcars")
     public ResponseEntity<HashMap<String,Object>> getLocationCars(HttpServletRequest request, @RequestBody Map<String, Integer> numbers) {
-
-
         return eachLocationService.getLocationCars(request, numbers);
     }
 
+    @DeleteMapping("deletelocationcars/{id}")
+    public ResponseEntity<HashMap<String,Object>> deleteLocationCars(HttpServletRequest request,  @PathVariable Integer id) {
+        return eachLocationService.deleteLocationCars(request, id);
+    }
 
 }
