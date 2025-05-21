@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Location {
@@ -22,6 +23,11 @@ public class Location {
     @ManyToOne
     @JoinColumn(name = "carRentalId",nullable = false)
     private Renter renter;
+
+    @OneToMany(mappedBy = "location")
+    private List<Car> cars;
+
+
 
     @PrePersist
     public void onCreate(){

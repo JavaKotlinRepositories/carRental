@@ -56,6 +56,7 @@ public class LocationController {
             return ResponseEntity.status(403).body(ret);
         }
     }
+
     @PostMapping("/getalllocations")
     public ResponseEntity<List<LocationSendDto>> getAllLocations(HttpServletRequest request, @RequestBody Map<String, Integer> numbers) {
         try{

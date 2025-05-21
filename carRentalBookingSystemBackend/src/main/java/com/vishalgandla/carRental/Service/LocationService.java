@@ -51,7 +51,9 @@ public class LocationService {
 
     public List<LocationSendDto>  getAllLocations(Renter renter, int num1, int num2) {
         System.out.println(num1+" "+num2);
-        Pageable pageable = PageRequest.of(num1, num2); // e.g., page 0, size 10
+        int size = num2 - num1 + 1;
+        int pagenum = num1 / size;
+        Pageable pageable = PageRequest.of(pagenum, size); // e.g., page 0, size 10
         Page<Location> page = locationRepository.findByRenterOrderByCreatedDateDesc(renter, pageable);
         List<Location> locations = page.getContent();
         List<LocationSendDto> ret= new ArrayList<>();
