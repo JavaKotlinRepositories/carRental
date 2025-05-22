@@ -18,7 +18,6 @@ const useCustomerGetOrders = () => {
         body:JSON.stringify({num1,num2})
       })
       const data=await response.json()
-      console.log(data)
       if(response.ok){
         setIsLoading(false)
         return data

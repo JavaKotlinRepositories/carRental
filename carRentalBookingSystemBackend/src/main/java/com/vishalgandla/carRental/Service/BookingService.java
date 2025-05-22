@@ -4,17 +4,23 @@ import com.vishalgandla.carRental.Dto.BookingDto;
 import com.vishalgandla.carRental.Model.Booking;
 import com.vishalgandla.carRental.Model.Car;
 import com.vishalgandla.carRental.Model.Customer;
+import com.vishalgandla.carRental.Model.Location;
 import com.vishalgandla.carRental.Repository.BookingRepository;
 import com.vishalgandla.carRental.Repository.CarRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +32,7 @@ public class BookingService {
     @Autowired
     private S3Service s3Service;
     @Value("${s3.carRentalCarPictures.buckentName}")
-    private String buckentName;
+    private String carPicturesBuckentName;
     public ResponseEntity<HashMap<String,Object>> createABooking(HttpServletRequest req,  BookingDto bookingDto) {
         HashMap<String,Object> response = new HashMap<>();
 
@@ -55,14 +61,13 @@ public class BookingService {
          booking.setCustomer(null);
          booking.setCar(null);
          car.setLocation(null);
-         String url=s3Service.getPresignedUrl(buckentName,car.getPhoto());
+         String url=s3Service.getPresignedUrl(carPicturesBuckentName,car.getPhoto());
          car.setPhoto(url);
         response.put("booking", booking);
         response.put("car", car);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     catch(Exception e){
-            System.out.println("=>"+e.getMessage());
             if(e.getMessage().contains("duplicate key value violates unique")) {
                 response.put("message", "date has already been booked choose a different date");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -72,4 +77,49 @@ public class BookingService {
     }
 
     }
+
+
+
+
+
+    public ResponseEntity<List<Booking>> getAllBookings(HttpServletRequest req, HashMap<String,Integer> map) {
+        List<Booking> response = new ArrayList<>();
+        try{
+            Customer cust=(Customer) req.getAttribute("customer");
+            if(cust==null){
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            int num1=map.get("num1");
+            int num2=map.get("num2");
+            int size = num2 - num1 + 1;
+            int pagenum = num1 / size;
+
+            Pageable pageable = PageRequest.of(pagenum, size);
+            Page<Booking> page=bookingRepository.findByCustomerOrderByBookingDateDescIdDesc(cust,pageable);
+            List<Booking> bookings = page.getContent();
+            for(Booking booking:bookings){
+                booking.setCustomer(null);
+                Car car=booking.getCar();
+                Location loc=car.getLocation();
+                loc.setRenter(null);
+                loc.setCarRentalPhoto(null);
+                car.setLocation(loc);
+
+
+                if(!booking.getCar().getPhoto().startsWith("https:")){
+                    String url=s3Service.getPresignedUrl(carPicturesBuckentName,car.getPhoto());
+
+                    car.setPhoto(url);
+                }
+
+                booking.setCar(car);
+            }
+            return new ResponseEntity<>(bookings, HttpStatus.OK);
+        }
+       catch(Exception e){
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+       }
+
+    }
+
 }
