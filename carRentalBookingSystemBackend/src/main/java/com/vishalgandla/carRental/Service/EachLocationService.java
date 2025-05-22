@@ -97,7 +97,6 @@ public class EachLocationService {
             int num1 = numbers.get("num1");
             int num2 = numbers.get("num2");
             int locationId = numbers.get("locationId");
-            System.out.println(num1+" "+num2+" "+locationId);
             ret.put("locationId", locationId);
             List<Location> locations=locationRepository.findByRenterAndId(renter,locationId);
             int size = num2 - num1 + 1;
@@ -106,7 +105,7 @@ public class EachLocationService {
             Page<Car> page =carRepository.findByLocationOrderByCreatedAtDesc(locations.get(0),pageable);
             List<Car> cars = page.getContent();
             List<CarSendDto> carDtos=new ArrayList<>();
-            System.out.println(cars.size());
+
             for(Car car:cars){
                 CarSendDto carDto=new CarSendDto();
                 carDto.setId(car.getId());

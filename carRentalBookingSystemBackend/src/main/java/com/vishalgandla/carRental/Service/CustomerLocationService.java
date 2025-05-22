@@ -1,34 +1,45 @@
 package com.vishalgandla.carRental.Service;
 
+import com.vishalgandla.carRental.Dto.CarSendDto;
 import com.vishalgandla.carRental.Dto.LocationSendDto;
 import com.vishalgandla.carRental.Dto.LocationSendDtoCustomer;
+import com.vishalgandla.carRental.Model.Car;
 import com.vishalgandla.carRental.Model.Customer;
 import com.vishalgandla.carRental.Model.Location;
+import com.vishalgandla.carRental.Repository.CarRepository;
 import com.vishalgandla.carRental.Repository.LocationRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CustomerLocationService {
 
     @Autowired
     LocationRepository locationRepository;
+    @Autowired
+    CarRepository carRepository;
 
     @Autowired
     S3Service s3Service;
 
+
+
     @Value("${s3.carRentalLocationPictures.buckentName}")
     String carRentalLocationBucket;
+
+    @Value("${s3.carRentalCarPictures.buckentName}")
+    String carRentalCarPicturesBuckent;
+
 
     public ResponseEntity<HashMap<String,Object>> customerFetchLocations(HttpServletRequest req, Map<String,String> latlong) {
         HashMap<String, Object> ret = new HashMap<>();
@@ -88,10 +99,48 @@ public class CustomerLocationService {
             ret.put("error", "Invalid latitude/longitude or database error.");
         }
 
-        Customer cust = (Customer) req.getAttribute("customer");
-        // You can use 'cust' for logging or personalization if needed
+
 
         return new ResponseEntity<>(ret, HttpStatus.OK);
     }
+
+    public ResponseEntity<HashMap<String,Object>> customerFetchCars(HttpServletRequest req, Map<String,String> numbers) {
+        HashMap<String, Object> ret = new HashMap<>();
+        ret.put("message", "No cars found.");
+        Integer num1 = Integer.parseInt(numbers.get("num1"));
+        Integer num2 = Integer.parseInt(numbers.get("num2"));
+        Integer locationId = Integer.parseInt(numbers.get("locationId"));
+
+
+        Optional<Location> locations=locationRepository.findById(locationId);
+        if(locations.isEmpty()) {
+            ret.put("message", "No location found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ret);
+        }
+        Location loc=locations.get();
+        int size = num2 - num1 + 1;
+        int pagenum = num1 / size;
+        Pageable pageable = PageRequest.of(pagenum, size);
+        Page<Car> page =carRepository.findByLocationOrderByCreatedAtDesc(loc,pageable);
+        List<Car> cars = page.getContent();
+        List<CarSendDto> carDtos=new ArrayList<>();
+
+        for(Car car:cars){
+            CarSendDto carDto=new CarSendDto();
+            carDto.setId(car.getId());
+            carDto.setMake(car.getMake());
+            carDto.setModel(car.getModel());
+            carDto.setYear(car.getYear());
+            carDto.setPricePerDay(car.getPricePerDay());
+            carDto.setLocationId(locationId);
+            carDto.setPhoto(s3Service.getPresignedUrl(carRentalCarPicturesBuckent,car.getPhoto()));
+            carDtos.add(carDto);
+        }
+        ret.put("cars", carDtos);
+
+
+        return ResponseEntity.ok(ret);
+    }
+
 
 }

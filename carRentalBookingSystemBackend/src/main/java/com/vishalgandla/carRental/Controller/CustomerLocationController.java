@@ -29,4 +29,10 @@ public class CustomerLocationController {
         return customerLocationService.customerFetchLocations(req, latlong);
     }
 
+
+    @PostMapping("/protectedcustomer/customerhome/fetchcars")
+    public ResponseEntity<HashMap<String,Object>> customerFetchCars(HttpServletRequest req, @RequestBody Map<String,String> numbers) {
+        return customerLocationService.customerFetchCars(req, numbers);
+    }
+
 }
