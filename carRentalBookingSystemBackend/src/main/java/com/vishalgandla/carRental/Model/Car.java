@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Car {
@@ -24,6 +25,8 @@ public class Car {
     @JoinColumn(name = "location_id")
     private Location location;
 
+    @OneToMany(mappedBy = "car")
+    List<Booking> bookings;
 
 
     public Location getLocation() {

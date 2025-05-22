@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Customer {
@@ -20,6 +21,9 @@ public class Customer {
     private String address;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+
+    @OneToMany(mappedBy = "customer")
+    List<Booking> bookings;
 
     @PrePersist
     public void onCreate(){
