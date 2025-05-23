@@ -13,11 +13,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,5 +124,24 @@ public class BookingService {
        }
 
     }
+    public ResponseEntity<HashMap<String,Object>> dateDisable(HttpServletRequest req, @RequestBody HashMap<String,Integer> map) {
+        HashMap<String,Object> ret=new HashMap<>();
+        try{
+            Integer carId=map.get("carId");
+            Customer cust=(Customer) req.getAttribute("customer");
+            if(cust==null){
+                ret.put("message", "Customer not found");
+                return new ResponseEntity<>(ret, HttpStatus.BAD_REQUEST);
+            }
+            List<Object> date=bookingRepository.findBookingDatesByCarId(carId);
+            ret.put("ret", date);
+        return new ResponseEntity<>(ret, HttpStatus.OK);
+        }
+        catch(Exception e){
+            ret.put("message", "something went wrong with your request");
+            return new ResponseEntity<>(ret, HttpStatus.BAD_REQUEST);
+        }
+    }
 
-}
+
+    }

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,4 +33,8 @@ public class BookingController {
         return bookingService.getAllBookings(req,map);
     }
 
+    @PostMapping("/protectedcustomer/booking/datestodisable")
+    public ResponseEntity<HashMap<String,Object>> dateDisable(HttpServletRequest req, @RequestBody HashMap<String,Integer> map) {
+        return bookingService.dateDisable(req,map);
+    }
 }
